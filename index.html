@@ -5,3 +5,24 @@
 <a target="_blank" href="/t#0xd2426eaa74bc162f2738295f58376f46ca9dd6705f450ff5dc805e4632fd7826">View Sample Webpage on Ethereum Blockchain</a>
 <br>
 <a target="_blank" href="https://etherscan.io/tx/0xd2426eaa74bc162f2738295f58376f46ca9dd6705f450ff5dc805e4632fd7826">Transaction on Blockchain</a>
+
+<br><br>
+
+<form>
+Enter an ethereum transaction to see as webpage:
+<input type="text" id="txn">
+<input type="button" value="submit" id="go">
+</form>
+
+As a sample you can enter, 0xd2426eaa74bc162f2738295f58376f46ca9dd6705f450ff5dc805e4632fd7826
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(function(){
+    $("#go").click(function(){
+        var txn = $("#txn").val();
+        window.location.href = '/t#' + txn;
+    });
+});
+
+</script>
