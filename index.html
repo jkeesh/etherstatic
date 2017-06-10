@@ -2,26 +2,106 @@
 
 <h2>Any data you attach on an ethereum transaction can now be a static webpage</h2>
 
-<a target="_blank" href="/t#0xd2426eaa74bc162f2738295f58376f46ca9dd6705f450ff5dc805e4632fd7826">View Sample Webpage on Ethereum Blockchain</a>
+<a target="_blank" href="/t#0xd2426eaa74bc162f2738295f58376f46ca9dd6705f450ff5dc805e4632fd7826">View Sample Hello world Webpage on Ethereum Blockchain</a>
 <br>
 <a target="_blank" href="https://etherscan.io/tx/0xd2426eaa74bc162f2738295f58376f46ca9dd6705f450ff5dc805e4632fd7826">Transaction on Blockchain</a>
 
 <br><br>
 
-<form>
+<a target="_blank" href="/t#0x4586856e98a800c277f1fe0b129a52c9e1e352caed88999d0c82ff8565937170">View Sample Webpage #2 on Ethereum Blockchain</a>
+<br>
+<a target="_blank" href="https://etherscan.io/tx/0x4586856e98a800c277f1fe0b129a52c9e1e352caed88999d0c82ff8565937170">Transaction on Blockchain</a>
+
+
+
+
+<br><br>
+
+
+<h2>View Ethereum transaction as static webpage</h2>
+
 Enter an ethereum transaction to see as webpage:
 <input type="text" id="txn">
-<input type="button" value="submit" id="go">
-</form>
+<button id="see-transaction">See Transaction</button>
 
-As a sample you can enter, 0xd2426eaa74bc162f2738295f58376f46ca9dd6705f450ff5dc805e4632fd7826
+<br><br>
+
+As a sample you can enter
+<br>
+0xd2426eaa74bc162f2738295f58376f46ca9dd6705f450ff5dc805e4632fd7826
+<br>
+0x4586856e98a800c277f1fe0b129a52c9e1e352caed88999d0c82ff8565937170
+<br>
+
+
+<h2>Encode Your Webpage as hex data to add to a transaction</h2>
+
+<h3>Convert ASCII Text to Hex</h3>
+<textarea id="ascii">
+Enter your html here
+</textarea>
+<br>
+<button id="convert-to-hex">Convert to Hex</button>
+
+<h4>Your Hex Result Here. Copy this as the input to the transaction</h4>
+<textarea id="hex">Your hex result will show here. Copy this as the input to the transaction.</textarea>
+<br>
+<button id="convert-to-ascii">Convert to ASCII</button>
+
+
+<h4>Author</h4>
+This website is made by Jeremy Keeshin. <br>
+<a href="http://twitter.com/jkeesh">Twitter</a><br>
+<a href="https://github.com/jkeesh/etherstatic">View source on github</a><br>
+Using ethereum nodes with <a href="https://infura.io">infura</a>.
+
+
+
+<style>
+textarea{
+    width: 400px;
+    height: 200px;
+    font-family: monospace;
+    margin-top: 5px;
+    word-wrap: break-word;
+}
+
+</style>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
+
+String.prototype.convertToHex = function (delim) {
+    return this.split("").map(function(c) {
+        return ("0" + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(delim || "");
+};
+
+function hex2a(hexx) {
+    var hex = hexx.toString();//force conversion
+    var str = '';
+    for (var i = 0; i < hex.length; i += 2)
+        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    return str;
+}
+
 $(function(){
-    $("#go").click(function(){
+    $("#see-transaction").click(function(){
         var txn = $("#txn").val();
         window.location.href = '/t#' + txn;
+    });
+
+    $("#convert-to-ascii").click(function(){
+        var val = $("#hex").val();
+        var result = hex2a(val);
+        $("#ascii").val(result);
+    });
+
+    $("#convert-to-hex").click(function(){
+        var val = $("#ascii").val();
+        var result = val.convertToHex();
+        $("#hex").val(result);
     });
 });
 
