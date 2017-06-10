@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <!--meta-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+    <title>Ethereum Web Viewer</title>
+
+</head>
+
+<body>
+    loading...
+
+    <!--scripts-->
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script src="https://rawcdn.githack.com/ethereum/web3.js/0.16.0/dist/web3.min.js"></script>
+
+    <script>
+        function hex2a(hexx) {
+            var hex = hexx.toString();//force conversion
+            var str = '';
+            for (var i = 0; i < hex.length; i += 2)
+                str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+            return str;
+        }
+
+        function getTransactionFromHash(){
+            return window.location.hash.substring(1)
+        }
+
+        $(function() {
+            // This uses an infura node as the source of the web3 data.
+            var web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/QTFInSGLqXeQLXg7KJ42'));
+
+            var txnhash = getTransactionFromHash();
+            var txn = web3.eth.getTransaction(txnhash, function(error, result){
+                console.log("TRANSACTION!");
+                if(error){
+                    $("html").html("Could not load transaction.");
+                }else{
+                    console.log(error);
+                    console.log(result);
+                    console.log(result.input);
+                    var webpage = hex2a(result.input);
+                    console.log(webpage);
+                    $("html").html(webpage)
+                }
+
+
+             })
+        });
+
+    </script>
+</body>
+
+</html>
