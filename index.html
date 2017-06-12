@@ -48,6 +48,8 @@ Enter your html here
 <button id="publish-button">Publish to Ethereum Blockchain</button>
 <p>Clicking the Publish button will pop up a dialog to confirm the transaction and set the data for you. The price you will pay is 0 ETH + the gas price</p>
 
+<div class="publish-msg"></div>
+
 <h2>How to Publish Webpage</h2>
 
 1. First download the <a href="metamask.io">metamask chrome extension</a>, though you could use any way of sending ether that lets you attach input data. You'll also need ether in your wallet.
@@ -57,7 +59,6 @@ Enter your html here
 4. That's it! Now go find the transaction hash and that will have the info to save your webpage.
 
 
-<div class="publish-msg"></div>
 
 <hr>
 
@@ -124,6 +125,10 @@ textarea{
     word-wrap: break-word;
 }
 
+.publish-msg{
+    color: blue;
+}
+
 </style>
 
 
@@ -181,7 +186,11 @@ $(function(){
             // If you get a transactionHash, you can assume it was sent,
             // or if you want to guarantee it was received, you can poll
             // for that transaction to be mined first.
-            renderMessage('.publish-msg', 'TransactionSent');
+            var link = "<a target='_blank' href='https://etherscan.io/tx/" + transactionHash + "'>View transaction on blockchain.</a>";
+
+            link += " <a target='_blank' href='http://etherstatic.com/t#" + transactionHash + "'>View webpage.</a>";
+
+            renderMessage('.publish-msg', 'Transaction Sent. ' + link);
         });
     });
 });
@@ -211,7 +220,7 @@ tipButton.addEventListener('click', function() {
     // If you get a transactionHash, you can assume it was sent,
     // or if you want to guarantee it was received, you can poll
     // for that transaction to be mined first.
-    renderMessage('.message', 'Thanks for the generosity!!');
+    renderMessage('.message', 'Thanks for the generosity!');
   });
 });
 function renderMessage (selector, message) {
