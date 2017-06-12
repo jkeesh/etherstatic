@@ -41,11 +41,12 @@ As a sample you can enter
 <br>
 
 <h2>Simple Publisher</h2>
-<textarea id="ascii-publish">
-Enter your html here
+<textarea id="ascii-publish" placeholder="Enter your html here">
 </textarea>
 <br>
 <button id="publish-button">Publish to Ethereum Blockchain</button>
+<span id="bytecount">0</span><span> bytes</span>
+
 <p>Clicking the Publish button will pop up a dialog to confirm the transaction and set the data for you. The price you will pay is 0 ETH + the gas price</p>
 
 <div class="publish-msg"></div>
@@ -153,6 +154,11 @@ $(function(){
     $("#see-transaction").click(function(){
         var txn = $("#txn").val();
         window.location.href = '/t#' + txn;
+    });
+
+    $("#ascii-publish").keyup(function() {
+        var val = $("#ascii-publish").val().length;
+        $("#bytecount").html(val);
     });
 
     $("#convert-to-ascii").click(function(){
