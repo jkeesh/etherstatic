@@ -40,8 +40,28 @@ As a sample you can enter
 0x4586856e98a800c277f1fe0b129a52c9e1e352caed88999d0c82ff8565937170
 <br>
 
+<h2>Simple Publisher</h2>
+<textarea id="ascii-publish">
+Enter your html here
+</textarea>
+<br>
+<button id="publish-button">Publish to Ethereum Blockchain</button>
+<p>Clicking the Publish button will pop up a dialog to confirm the transaction and set the data for you. The price you will pay is 0 ETH + the gas price</p>
 
-<h2>Encode Your Webpage as hex data to add to a transaction</h2>
+<h2>How to Publish Webpage</h2>
+
+1. First download the <a href="metamask.io">metamask chrome extension</a>, though you could use any way of sending ether that lets you attach input data. You'll also need ether in your wallet.
+<br>
+2. Create your html web page and enter it in the textarea above.<br>
+3. Click the button "Publish to Ethereum Blockchain"<br>
+4. That's it! Now go find the transaction hash and that will have the info to save your webpage.
+
+
+<div class="publish-msg"></div>
+
+<hr>
+
+<h2>Manual - Encode Your Webpage as hex data to add to a transaction</h2>
 
 <h3>Convert ASCII Text to Hex</h3>
 <textarea id="ascii">
@@ -50,12 +70,13 @@ Enter your html here
 <br>
 <button id="convert-to-hex">Convert to Hex</button>
 
+
 <h4>Your Hex Result Here. Copy this as the input to the transaction</h4>
 <textarea id="hex">Your hex result will show here. Copy this as the input to the transaction.</textarea>
 <br>
 <button id="convert-to-ascii">Convert to ASCII</button>
 
-<h2>How to Publish Webpage</h2>
+<h2>How to Manually Publish Webpage</h2>
 
 1. First download the metamask chrome extension, though you could use any way of sending ether that lets you attach input data. You'll also need ether in your wallet.
 <br>
@@ -71,6 +92,12 @@ Enter your html here
 Like this project? Thank you!
 
 You can send ethereum tips to: jeremykeeshin.eth or 0xf639fFF07E0ef4e885B9Cb298CC5E25D0D7A09b6.
+
+<br><br>
+<input type="text" id="tip-amount" placeholder="Enter amount in ether">
+<button class="tip-button">Tip with Metamask</button>
+
+<div class="message"></div>
 
 <h4>Other technical details</h4>
 
@@ -134,6 +161,63 @@ $(function(){
         var result = val.convertToHex();
         $("#hex").val(result);
     });
+
+
+    $("#publish-button").click(function(){
+        var val = $("#ascii-publish").val();
+        var result = val.convertToHex();
+        var user_address = web3.eth.accounts[0];
+        web3.eth.sendTransaction({
+            // The user sends to themselves
+            to: user_address,
+            // The user sends from themselves
+            from: user_address,
+            // The value of the transaction is 0, so they just pay gas.
+            value: web3.toWei(0, 'ether'),
+            // This is the webpage to publish
+            data: result,
+        }, function (err, transactionHash) {
+            if (err) return renderMessage('.publish-msg', 'There was a problem!: ' + err.message);
+            // If you get a transactionHash, you can assume it was sent,
+            // or if you want to guarantee it was received, you can poll
+            // for that transaction to be mined first.
+            renderMessage('.publish-msg', 'TransactionSent');
+        });
+    });
 });
+
+
+
+//////////////////////////////////////////
+/// Metmask tip button
+
+var MY_ADDRESS = '0xf639fFF07E0ef4e885B9Cb298CC5E25D0D7A09b6';
+var tipButton = document.querySelector('.tip-button');
+tipButton.addEventListener('click', function() {
+  if (typeof web3 === 'undefined') {
+    return renderMessage('<div>You need to install <a href=“https://metmask.io“>MetaMask </a> to use this feature.  <a href=“https://metmask.io“>https://metamask.io</a></div>');
+  }
+
+  var tipAmount = $("#tip-amount").val();
+  console.log(tipAmount);
+
+  var user_address = web3.eth.accounts[0];
+  web3.eth.sendTransaction({
+    to: MY_ADDRESS,
+    from: user_address,
+    value: web3.toWei(tipAmount, 'ether'),
+  }, function (err, transactionHash) {
+    if (err) return renderMessage('.message', 'There was a problem!: ' + err.message);
+    // If you get a transactionHash, you can assume it was sent,
+    // or if you want to guarantee it was received, you can poll
+    // for that transaction to be mined first.
+    renderMessage('.message', 'Thanks for the generosity!!');
+  });
+});
+function renderMessage (selector, message) {
+  var messageEl = document.querySelector(selector);
+  messageEl.innerHTML = message;
+}
+
 
 </script>
