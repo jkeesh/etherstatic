@@ -183,7 +183,7 @@ async function sendTransaction(result) {
     const transactionParameters = {
       nonce: '0x00', // ignored by MetaMask
       //gasPrice: '0x09184e72a000', // customizable by user during MetaMask confirmation.
-      gas: '0x5208', // customizable by user during MetaMask confirmation.
+      gas: '0x7208', // customizable by user during MetaMask confirmation.
       to: '0xf639fFF07E0ef4e885B9Cb298CC5E25D0D7A09b6', // Required except during contract publications.
       from: ethereum.selectedAddress, // must match user's active address.
       value: '0x00', // Only required to send ether to the recipient from the initiating external account.
@@ -197,15 +197,28 @@ async function sendTransaction(result) {
       method: 'eth_sendTransaction',
       params: [transactionParameters],
     })
-    .then((txHash) => console.log(txHash))
+    .then((txHash) => {
+        console.log(txHash)
+
+        // If you get a transactionHash, you can assume it was sent,
+        // or if you want to guarantee it was received, you can poll
+        // for that transaction to be mined first.
+        var link = "<a target='_blank' href='https://etherscan.io/tx/" + txHash + "'>View transaction on blockchain.</a>";
+
+        link += " <a target='_blank' href='http://etherstatic.com/t#" + txHash + "'>View webpage.</a>";
+
+        renderMessage('.publish-msg', 'Transaction Sent. ' + link);
+    })
     .catch((error) => console.error);
+
+    // }, function (err, transactionHash) {
+    //     if (err) return renderMessage('.publish-msg', 'There was a problem!: ' + err.message);
+
+    // });
 
 }
 
 $(function(){
-    // var alchemyURL = "https://eth-mainnet.alchemyapi.io/v2/2AgQNs9chrJ0kzRGh9v2OG6Kc8jJ_luT";
-    //         // This uses an alchemy url as the source of the web3 data.
-    // var web3 = new Web3(alchemyURL);
 
     $("#see-transaction").click(function(){
         var txn = $("#txn").val();
@@ -239,47 +252,8 @@ $(function(){
 
         sendTransaction(result)
 
-        // getAccount().then(function(){
-        // })
 
 
-        // function ethEnabled(){
-        //   if (window.ethereum) {
-        //     window.web3 = new Web3(window.ethereum);
-        //     window.ethereum.enable();
-        //     return true;
-        //   }
-        //   return false;
-        // }
-        // console.log(ethEnabled())
-
-
-        // var user_address = web3.eth.accounts[0];
-        // web3.eth.getAccounts(console.log);
-
-        // web3.eth.getBlockNumber().then(console.log);
-        // // web3.eth.getAccounts().then(console.log);
-        // console.log(user_address)
-        // web3.eth.sendTransaction({
-        //     // The user sends to themselves
-        //     to: user_address,
-        //     // The user sends from themselves
-        //     from: user_address,
-        //     // The value of the transaction is 0, so they just pay gas.
-        //     value: web3.toWei(0, 'ether'),
-        //     // This is the webpage to publish
-        //     data: result,
-        // }, function (err, transactionHash) {
-        //     if (err) return renderMessage('.publish-msg', 'There was a problem!: ' + err.message);
-        //     // If you get a transactionHash, you can assume it was sent,
-        //     // or if you want to guarantee it was received, you can poll
-        //     // for that transaction to be mined first.
-        //     var link = "<a target='_blank' href='https://etherscan.io/tx/" + transactionHash + "'>View transaction on blockchain.</a>";
-
-        //     link += " <a target='_blank' href='http://etherstatic.com/t#" + transactionHash + "'>View webpage.</a>";
-
-        //     renderMessage('.publish-msg', 'Transaction Sent. ' + link);
-        // });
     });
 });
 
@@ -311,10 +285,10 @@ $(function(){
 //     renderMessage('.message', 'Thanks for the generosity!');
 //   });
 // });
-// function renderMessage (selector, message) {
-//   var messageEl = document.querySelector(selector);
-//   messageEl.innerHTML = message;
-// }
+function renderMessage (selector, message) {
+  var messageEl = document.querySelector(selector);
+  messageEl.innerHTML = message;
+}
 
 
 </script>
