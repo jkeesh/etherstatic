@@ -24,6 +24,13 @@
 <a target="_blank" href="https://etherscan.io/tx/0x8304c760938b30d17c85b86cb995ff59ef1287197ea2797cea59dc90e2908f21">Transaction on Blockchain</a>
 <br><br>
 
+<a target="_blank" href="/t/#0x93e29afee14093f1159ff34ac8703b10dc7e52b409ffac2369f8c520e804068a">View 2017 blog post</a>
+<br>
+<a target="_blank" href="https://etherscan.io/tx/0x93e29afee14093f1159ff34ac8703b10dc7e52b409ffac2369f8c520e804068a">Transaction on Blockchain</a>
+<br><br>
+
+
+
 
 <h2>View Ethereum transaction as static webpage</h2>
 
@@ -41,6 +48,11 @@ As a sample you can enter
 <br>
 
 <h2>Simple Publisher</h2>
+
+<button class="enableEthereumButton">Connect Wallet</button>
+<h2>Account: <span class="showAccount"></span></h2>
+
+
 <textarea id="ascii-publish" placeholder="Enter your html here">
 </textarea>
 <br>
@@ -89,22 +101,12 @@ Enter your html here
 6. That's it! Now go find the transaction hash and that will have the info to save your webpage.
 
 
-<h2>Support this project</h2>
-
-Like this project? Thank you!
-
-You can send ethereum tips to: jeremykeeshin.eth or 0xf639fFF07E0ef4e885B9Cb298CC5E25D0D7A09b6.
-
-<br><br>
-<input type="text" id="tip-amount" placeholder="Enter amount in ether">
-<button class="tip-button">Tip with Metamask</button>
-
 <div class="message"></div>
 
 <h4>Other technical details</h4>
 
 <p>
-In the <a href="https://etherscan.io/tx/0x4586856e98a800c277f1fe0b129a52c9e1e352caed88999d0c82ff8565937170">sample</a> above the transaction included 913 bytes of data. The cumulative gas used was 104084. The actual cost was $0.56. The gas limit is right now around 3.14 million. There is a limit on the size of the pages which would be the size that hits the max gas limit. It would get more expensive to store larger web pages but for basic pages or text it is cheap to store forever.
+In the <a href="https://etherscan.io/tx/0x4586856e98a800c277f1fe0b129a52c9e1e352caed88999d0c82ff8565937170">sample</a> above (sent in June 2017) the transaction included 913 bytes of data. The cumulative gas used was 104084. The actual cost was $0.56. The gas limit is right now around 3.14 million. There is a limit on the size of the pages which would be the size that hits the max gas limit. It would get more expensive to store larger web pages but for basic pages or text it is cheap to store forever.
 </p>
 
 
@@ -114,9 +116,6 @@ This website is made by Jeremy Keeshin. <br>
 <a href="http://twitter.com/jkeesh">Twitter</a><br>
 <a href="https://github.com/jkeesh/etherstatic">View source on github</a><br>
 Using ethereum nodes with <a href="https://www.alchemyapi.io/">Alchemy API</a>.
-
-<h4>Links</h4>
-<p>Listed on the Dapps directory <a target="_blank" href="https://dapps.ethercasts.com/">State of the Dapps at Ethercast</a>.
 
 
 <style>
@@ -136,7 +135,34 @@ textarea{
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+
 <script>
+if (typeof window.ethereum !== 'undefined') {
+  console.log('MetaMask is installed!');
+}
+
+// Source https://docs.metamask.io/guide/getting-started.html#basic-considerations
+const ethereumButton = document.querySelector('.enableEthereumButton');
+const showAccount = document.querySelector('.showAccount');
+
+ethereumButton.addEventListener('click', () => {
+  getAccount();
+});
+
+
+async function getAccount() {
+  const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+  const account = accounts[0];
+  showAccount.innerHTML = account;
+}
+
+ethereum.on('accountsChanged', function (accounts) {
+  const account = accounts[0];
+  showAccount.innerHTML = account;
+});
+
 
 String.prototype.convertToHex = function (delim) {
     return this.split("").map(function(c) {
@@ -152,7 +178,35 @@ function hex2a(hexx) {
     return str;
 }
 
+
+async function sendTransaction(result) {
+    const transactionParameters = {
+      nonce: '0x00', // ignored by MetaMask
+      //gasPrice: '0x09184e72a000', // customizable by user during MetaMask confirmation.
+      gas: '0x5208', // customizable by user during MetaMask confirmation.
+      to: '0xf639fFF07E0ef4e885B9Cb298CC5E25D0D7A09b6', // Required except during contract publications.
+      from: ethereum.selectedAddress, // must match user's active address.
+      value: '0x00', // Only required to send ether to the recipient from the initiating external account.
+      data: result, // Optional, but used for defining smart contract creation and interaction.
+      chainId: '0x3', // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
+    };
+
+    // txHash is a hex string
+    // As with any RPC call, it may throw an error
+    const txHash = await ethereum.request({
+      method: 'eth_sendTransaction',
+      params: [transactionParameters],
+    })
+    .then((txHash) => console.log(txHash))
+    .catch((error) => console.error);
+
+}
+
 $(function(){
+    // var alchemyURL = "https://eth-mainnet.alchemyapi.io/v2/2AgQNs9chrJ0kzRGh9v2OG6Kc8jJ_luT";
+    //         // This uses an alchemy url as the source of the web3 data.
+    // var web3 = new Web3(alchemyURL);
+
     $("#see-transaction").click(function(){
         var txn = $("#txn").val();
         window.location.href = '/t#' + txn;
@@ -175,31 +229,57 @@ $(function(){
         $("#hex").val(result);
     });
 
-
     $("#publish-button").click(function(){
+
         var val = $("#ascii-publish").val();
         var result = val.convertToHex();
-        var user_address = web3.eth.accounts[0];
-        web3.eth.sendTransaction({
-            // The user sends to themselves
-            to: user_address,
-            // The user sends from themselves
-            from: user_address,
-            // The value of the transaction is 0, so they just pay gas.
-            value: web3.toWei(0, 'ether'),
-            // This is the webpage to publish
-            data: result,
-        }, function (err, transactionHash) {
-            if (err) return renderMessage('.publish-msg', 'There was a problem!: ' + err.message);
-            // If you get a transactionHash, you can assume it was sent,
-            // or if you want to guarantee it was received, you can poll
-            // for that transaction to be mined first.
-            var link = "<a target='_blank' href='https://etherscan.io/tx/" + transactionHash + "'>View transaction on blockchain.</a>";
 
-            link += " <a target='_blank' href='http://etherstatic.com/t#" + transactionHash + "'>View webpage.</a>";
+        console.log("data");
+        console.log(result);
 
-            renderMessage('.publish-msg', 'Transaction Sent. ' + link);
-        });
+        sendTransaction(result)
+
+        // getAccount().then(function(){
+        // })
+
+
+        // function ethEnabled(){
+        //   if (window.ethereum) {
+        //     window.web3 = new Web3(window.ethereum);
+        //     window.ethereum.enable();
+        //     return true;
+        //   }
+        //   return false;
+        // }
+        // console.log(ethEnabled())
+
+
+        // var user_address = web3.eth.accounts[0];
+        // web3.eth.getAccounts(console.log);
+
+        // web3.eth.getBlockNumber().then(console.log);
+        // // web3.eth.getAccounts().then(console.log);
+        // console.log(user_address)
+        // web3.eth.sendTransaction({
+        //     // The user sends to themselves
+        //     to: user_address,
+        //     // The user sends from themselves
+        //     from: user_address,
+        //     // The value of the transaction is 0, so they just pay gas.
+        //     value: web3.toWei(0, 'ether'),
+        //     // This is the webpage to publish
+        //     data: result,
+        // }, function (err, transactionHash) {
+        //     if (err) return renderMessage('.publish-msg', 'There was a problem!: ' + err.message);
+        //     // If you get a transactionHash, you can assume it was sent,
+        //     // or if you want to guarantee it was received, you can poll
+        //     // for that transaction to be mined first.
+        //     var link = "<a target='_blank' href='https://etherscan.io/tx/" + transactionHash + "'>View transaction on blockchain.</a>";
+
+        //     link += " <a target='_blank' href='http://etherstatic.com/t#" + transactionHash + "'>View webpage.</a>";
+
+        //     renderMessage('.publish-msg', 'Transaction Sent. ' + link);
+        // });
     });
 });
 
@@ -208,33 +288,33 @@ $(function(){
 //////////////////////////////////////////
 /// Metmask tip button
 
-var MY_ADDRESS = '0xf639fFF07E0ef4e885B9Cb298CC5E25D0D7A09b6';
-var tipButton = document.querySelector('.tip-button');
-tipButton.addEventListener('click', function() {
-  if (typeof web3 === 'undefined') {
-    return renderMessage('<div>You need to install <a href=“https://metmask.io“>MetaMask </a> to use this feature.  <a href=“https://metmask.io“>https://metamask.io</a></div>');
-  }
+// var MY_ADDRESS = '0xf639fFF07E0ef4e885B9Cb298CC5E25D0D7A09b6';
+// var tipButton = document.querySelector('.tip-button');
+// tipButton.addEventListener('click', function() {
+//   if (typeof web3 === 'undefined') {
+//     return renderMessage('<div>You need to install <a href=“https://metmask.io“>MetaMask </a> to use this feature.  <a href=“https://metmask.io“>https://metamask.io</a></div>');
+//   }
 
-  var tipAmount = $("#tip-amount").val();
-  console.log(tipAmount);
+//   var tipAmount = $("#tip-amount").val();
+//   console.log(tipAmount);
 
-  var user_address = web3.eth.accounts[0];
-  web3.eth.sendTransaction({
-    to: MY_ADDRESS,
-    from: user_address,
-    value: web3.toWei(tipAmount, 'ether'),
-  }, function (err, transactionHash) {
-    if (err) return renderMessage('.message', 'There was a problem!: ' + err.message);
-    // If you get a transactionHash, you can assume it was sent,
-    // or if you want to guarantee it was received, you can poll
-    // for that transaction to be mined first.
-    renderMessage('.message', 'Thanks for the generosity!');
-  });
-});
-function renderMessage (selector, message) {
-  var messageEl = document.querySelector(selector);
-  messageEl.innerHTML = message;
-}
+//   var user_address = web3.eth.accounts[0];
+//   web3.eth.sendTransaction({
+//     to: MY_ADDRESS,
+//     from: user_address,
+//     value: web3.toWei(tipAmount, 'ether'),
+//   }, function (err, transactionHash) {
+//     if (err) return renderMessage('.message', 'There was a problem!: ' + err.message);
+//     // If you get a transactionHash, you can assume it was sent,
+//     // or if you want to guarantee it was received, you can poll
+//     // for that transaction to be mined first.
+//     renderMessage('.message', 'Thanks for the generosity!');
+//   });
+// });
+// function renderMessage (selector, message) {
+//   var messageEl = document.querySelector(selector);
+//   messageEl.innerHTML = message;
+// }
 
 
 </script>
