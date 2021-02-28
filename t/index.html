@@ -14,7 +14,7 @@
 
     <!--scripts-->
     <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-    <script src="https://rawcdn.githack.com/ethereum/web3.js/0.16.0/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 
     <script>
         function hex2a(hexx) {
@@ -30,8 +30,9 @@
         }
 
         $(function() {
-            // This uses an infura node as the source of the web3 data.
-            var web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/QTFInSGLqXeQLXg7KJ42'));
+            var alchemyURL = "https://eth-mainnet.alchemyapi.io/v2/2AgQNs9chrJ0kzRGh9v2OG6Kc8jJ_luT";
+            // This uses an alchemy url as the source of the web3 data.
+            var web3 = new Web3(alchemyURL);
 
             var txnhash = getTransactionFromHash();
             var txn = web3.eth.getTransaction(txnhash, function(error, result){

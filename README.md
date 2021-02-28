@@ -35,7 +35,8 @@ associated with the size of the data.
 ### How to run
 
 - Clone the git repository
-- Run `$ python -m SimpleHTTPServer 8080`
+- Run `$ python -m http.server 8080`
+    Updated for python3
 - Visit in your browser at localhost:8080
 
 ### Links
@@ -43,3 +44,8 @@ associated with the size of the data.
 This website is built using ethereum nodes from infura https://infura.io/
 
 Listed on the State of the Dapps: https://dapps.ethercasts.com/
+
+
+### Web3 Library
+
+https://github.com/ChainSafe/web3.js?source=post_page-----e3fbe89111c3----------------------
