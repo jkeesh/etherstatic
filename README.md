@@ -39,6 +39,11 @@ associated with the size of the data.
     Updated for python3
 - Visit in your browser at localhost:8080
 
+## To deploy
+
+- $ git push web master
+
+
 ### Links
 
 This website is built using ethereum nodes from infura https://infura.io/
