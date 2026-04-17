@@ -32,25 +32,32 @@ The html or ascii data is converted to hex and then published as the data in a
 transaction. The value sent is 0, so the total cost paid is the cost of the gas
 associated with the size of the data.
 
-### How to run
+### How to run locally
 
-- Clone the git repository
-- Run `$ python -m http.server 8080`
-    Updated for python3
-- Visit in your browser at localhost:8080
+    python3 -m http.server 8080
 
-## To deploy
+Then visit http://localhost:8080/
 
-- $ git push web master
+### To deploy
 
+    git push web master       # → live site (post-receive hook auto-deploys)
+    git push origin master    # → GitHub mirror
 
-### Links
+### Remotes
 
-This website is built using ethereum nodes from infura https://infura.io/
+- `origin` → `git@github.com:jkeesh/etherstatic.git`
+- `web`    → `ssh://jkeesh@172.234.29.183/home/jkeesh/repos/etherstatic.git` (new Linode)
 
-Listed on the State of the Dapps: https://dapps.ethercasts.com/
+### Infrastructure
 
+- **Ethereum reads:** the viewer at `/t/` uses a free public JSON-RPC endpoint
+  (`https://ethereum-rpc.publicnode.com`) via native `fetch()`. No API key.
+  Swap one line in `t/index.html` to a different endpoint if it goes down
+  (llamarpc, blastapi, meowrpc, etc.).
+- **Web3 library:** none — originally used web3.js, but web3@latest (v4) dropped
+  the callback API the viewer relied on. Rewritten to just use `fetch()` and
+  hex-decode the transaction `input` field directly. Smaller, simpler, faster.
 
-### Web3 Library
+### Listed on
 
-https://github.com/ChainSafe/web3.js?source=post_page-----e3fbe89111c3----------------------
+State of the Dapps: https://dapps.ethercasts.com/
