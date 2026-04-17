@@ -30,9 +30,11 @@
         }
 
         $(function() {
-            var alchemyURL = "https://eth-mainnet.alchemyapi.io/v2/2AgQNs9chrJ0kzRGh9v2OG6Kc8jJ_luT";
-            // This uses an alchemy url as the source of the web3 data.
-            var web3 = new Web3(alchemyURL);
+            // Public Ethereum JSON-RPC endpoint (no API key, no signup).
+            // Easy to swap: eth.llamarpc.com, ethereum-rpc.publicnode.com,
+            // rpc.ankr.com/eth, eth.drpc.org, eth-mainnet.public.blastapi.io
+            var rpcURL = "https://eth.llamarpc.com";
+            var web3 = new Web3(rpcURL);
 
             var txnhash = getTransactionFromHash();
             var txn = web3.eth.getTransaction(txnhash, function(error, result){
