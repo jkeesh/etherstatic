@@ -1,60 +1,65 @@
 <!DOCTYPE html>
-
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-
-    <!--meta-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" />
-    <title>Ethereum Web Viewer</title>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ethereum Web Viewer</title>
+  <style>
+    /* Minimal default styling; gets overridden if the on-chain payload has its own styles */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      max-width: 820px;
+      margin: 40px auto;
+      padding: 0 20px;
+      line-height: 1.55;
+      color: #111;
+    }
+  </style>
 </head>
-
 <body>
-    loading...
+  <p id="status">Loading from the Ethereum blockchain…</p>
 
-    <!--scripts-->
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script>
+    // Public Ethereum JSON-RPC — no API key required.
+    // Easy to swap: eth.llamarpc.com, eth-mainnet.public.blastapi.io, eth.meowrpc.com
+    const RPC = "https://ethereum-rpc.publicnode.com";
 
-    <script>
-        function hex2a(hexx) {
-            var hex = hexx.toString();//force conversion
-            var str = '';
-            for (var i = 0; i < hex.length; i += 2)
-                str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-            return str;
-        }
+    function hexToStr(hex) {
+      if (hex.startsWith("0x")) hex = hex.slice(2);
+      let out = "";
+      for (let i = 0; i < hex.length; i += 2) {
+        out += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+      }
+      return out;
+    }
 
-        function getTransactionFromHash(){
-            return window.location.hash.substring(1)
-        }
+    async function load() {
+      const status = document.getElementById("status");
+      const txhash = location.hash.substring(1);
+      if (!txhash) { status.textContent = "Append a transaction hash after #"; return; }
 
-        $(function() {
-            // Public Ethereum JSON-RPC endpoint (no API key, no signup).
-            // Easy to swap: eth.llamarpc.com, ethereum-rpc.publicnode.com,
-            // rpc.ankr.com/eth, eth.drpc.org, eth-mainnet.public.blastapi.io
-            var rpcURL = "https://ethereum-rpc.publicnode.com";
-            var web3 = new Web3(rpcURL);
-
-            var txnhash = getTransactionFromHash();
-            var txn = web3.eth.getTransaction(txnhash, function(error, result){
-                console.log("TRANSACTION!");
-                if(error){
-                    $("html").html("Could not load transaction.");
-                }else{
-                    console.log(error);
-                    console.log(result);
-                    console.log(result.input);
-                    var webpage = hex2a(result.input);
-                    console.log(webpage);
-                    $("html").html(webpage)
-                }
-
-
-             })
+      try {
+        const res = await fetch(RPC, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            method: "eth_getTransactionByHash",
+            params: [txhash],
+            id: 1,
+          }),
         });
+        const json = await res.json();
+        if (!json.result) { status.textContent = "Could not load transaction."; return; }
+        const webpage = hexToStr(json.result.input);
+        // Replace body content with the on-chain HTML. Keeps <head> (viewport + base styles) intact.
+        document.body.innerHTML = webpage;
+      } catch (err) {
+        status.textContent = "Error: " + err.message;
+      }
+    }
 
-    </script>
+    load();
+  </script>
 </body>
-
 </html>
